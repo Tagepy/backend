@@ -5,21 +5,21 @@ const { post } = require("../routes/mainRouter");
 
 module.exports = {
   registerUser: async (req, res) => {
-    const { email, pass1 } = req.body;
+    const { email, password } = req.body;
     const userExists = await userDb.findOne({ email });
     if (!!userExists) {
       return res.send({ message: "email already registered" });
     }
     const user = new userDb();
     user.email = email;
-    user.password = pass1;
+    user.password = password;
     user.secret = nanoid();
     await user.save();
     res.send({ message: "User created, all good" });
   },
   login: async (req, res) => {
-    const { email, pass1 } = req.body;
-    const user = await userDb.findOne({ email, pass1 });
+    const { email, password } = req.body;
+    const user = await userDb.findOne({ email, password });
     if (!!user) {
       res.send({ loggedIn: true, user });
     } else {
@@ -46,9 +46,11 @@ module.exports = {
 
     res.send({ success: true });
   },
+
   getAll: async (req, res) => {
     const products = await productDb.find();
-    res.send({ products });
+    const users = await userDb.find();
+    res.send({ products, users });
   },
   getSingle: async (req, res) => {
     const { id } = req.params;
